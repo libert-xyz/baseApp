@@ -9,7 +9,11 @@ class FlaskrTestCase(unittest.TestCase):
     def setUp(self):
         app.config.from_object('config.TestingConfig')
         self.app = app.test_client()
+        db.drop_all()
         db.create_all()
+
+    def tearDown(self):
+        pass
 
 
     def test_index(self):
@@ -32,9 +36,16 @@ class FlaskrTestCase(unittest.TestCase):
     def test_message_post(self):
         response = self.post_message('Libert','Just Like you Imagined')
         self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Just Like you Imagined',response.data)
 
         # response2 = self.app.get('/',content_type='html/text')
         # self.assertIn(b'Just Like you Imagined', response2.data)
+
+    def test_message_get(self):
+        self.post_message('Libert','Just Like you Imagined')
+        response = self.app.get('/api',content_type='application/json')
+        self.assertIn(b'Just Like you Imagined', response.data)
+
 
 
 if __name__ == '__main__':
