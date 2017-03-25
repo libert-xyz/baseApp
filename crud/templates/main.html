@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+  <title>GuestBook Sample App </title>
+
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,300,400italic,700,900' rel='stylesheet' type='text/css'>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Techie Bootstrap 3 skin">
+  <meta name="keywords" content="bootstrap 3, skin, flat">
+  <meta name="author" content="bootstraptaste">
+
+  <!-- Bootstrap css -->
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/css/bootstrap.techie.css" rel="stylesheet">
+
+  <!-- Docs Custom styles -->
+  <style>
+body,html{overflow-x:hidden}body{padding:60px 20px 0}footer{border-top:1px solid #ddd;padding:30px;margin-top:50px}.row>[class*=col-]{margin-bottom:40px}.navbar-container{position:relative;min-height:100px}.navbar.navbar-fixed-bottom,.navbar.navbar-fixed-top{position:absolute;top:50px;z-index:0}.navbar.navbar-fixed-bottom .container,.navbar.navbar-fixed-top .container{max-width:90%}.btn-group{margin-bottom:10px}.form-inline input[type=password],.form-inline input[type=text],.form-inline select{width:180px}.input-group{margin-bottom:10px}.pagination{margin-top:0}.navbar-inverse{margin:110px 0}
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- COMPONENTS =========================================================== -->
+
+ <div class="jumbotron">
+  <h1>Guest Book App - v 1.0</h1>
+  <p>Sample app for testing Web Services, <a href="https://www.nuvops.com">NuvOps</a></p>
+  <p><a class="btn btn-primary btn-lg" href="#" role="button">Source Code</a></p>
+</div>
+
+
+    <div class="row"  >
+      <!-- Controls -->
+      <div class="col-sm-12 col-lg-12">
+        <div class="row">
+          <div class="col-sm-4 col-lg-6">
+            <p class="lead text-muted">Sign me</p>
+
+            <div class="input-group">
+              <span class="input-group-addon">@</span>
+              <input id='nick' type="text" class="form-control" placeholder="Anonymous">
+            </div>
+            <br>
+            <div class="input-group">
+              <textarea id='mess' type="text" class="form-control" rows="3"></textarea>
+              <span class="input-group-btn">
+                <button id='addmsg' class="btn btn-success" type="button">Post!</button>
+              </span>
+            </div>
+
+
+            <div class="alert alert-success hidden" id='success'>
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <strong>Well done!</strong>
+            </div>
+
+            <div class="alert alert-danger hidden" id='error'>
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <strong>Text to short</strong>
+            </div>
+
+            <div class="alert alert-warning hidden" id='servererror'>
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <strong>Server Error</strong>
+            </div>
+
+          </div>
+
+
+          <!-- Messages -->
+
+              <div class="row">
+                <div class="col-sm-6 col-lg-6">
+                  <p class="lead text-muted">Msg</p>
+                  <table class="table table-striped" data-effect="fade">
+                    <thead>
+                      <tr>
+                        <th>Nickname</th>
+                        <th>Comment</th>
+                      </tr>
+                    </thead>
+                    <tbody id='messages'>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+          <div class="clearfix visible-sm visible-md"></div>
+
+        </div>
+      </div>
+      <!-- Extended -->
+    </div>
+  </div> <!-- /container -->
+
+  <footer class="text-center">
+    <p>&copy; NuvOps</p>
+    <div class="credits">
+        <a href="https://www.nuvops.com/">NuvOps</a> by <a href="https://libert.xyz/">Libert R Schmidt</a>
+    </div>
+  </footer>
+
+
+  <!-- Main Scripts-->
+  <script src="static/js/jquery.js"></script>
+  <script src="static/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(function() {
+
+      var $messages = $('#messages');
+      var $nick = $('#nick');
+      var $mess = $('#mess');
+
+      $.ajax({
+        type: 'GET',
+        url: '/api',
+        success: function(messages){
+          console.log(messages);
+          $.each(messages['Messages'], function(i,msg){
+          $messages.append('<tr><td>' + msg.nickname + '</td><td>' + msg.message + '</td></tr>');
+
+          //$messages.append($("#template").html());
+
+          });
+        },
+        error: function(){
+          console.log('some error getting the nessages')
+        }
+      });
+
+      $('#addmsg').on('click', function() {
+        mess = $mess.val();
+        if (mess.length > 8){
+
+          $.ajax({
+            type: 'POST',
+            url: '/api',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({
+                'nick': $nick.val(),
+                'text': $mess.val()
+            }),
+            success: function(newmsg){
+              $mess.val('');
+              $messages.prepend('<tr><td>' + newmsg.nickname + '</td><td>' + newmsg.message + '</td></tr>');
+              $("#success").removeClass('hidden');
+              $("#success").fadeTo(2000, 500).slideUp(500, function(){
+              $("#success").slideUp(500);
+                  });
+
+            },
+            error: function(){
+              $("#servererror").removeClass('hidden');
+              $("#servererror").fadeTo(2000, 500).slideUp(500, function(){
+              $("#servererror").slideUp(500);
+                    });
+
+            }
+
+          })}
+
+          else{
+            $("#error").removeClass('hidden');
+            $("#error").fadeTo(2000, 500).slideUp(500, function(){
+            $("#error").slideUp(500);
+                });
+
+          }
+
+      });
+
+    });
+  </script>
+    <!-- Bootstrap 3 has typeahead optionally -->
+    <script src="static/js/typeahead.min.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+<div class="row">
+  <!-- Messages -->
+  <div class="col-sm-6 col-lg-6">
+    {% for m in messages %}
+    <div class="accordion" id="accordion">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="accordion" href=#{{m.id}}>
+            <em class="fa fa-minus fa-fw"></em>{{m.nickname}} | {{m.date_message}}
+          </a>
+        </div>
+        <div id={{m.id}} class="accordion-body collapse">
+          <div class="accordion-inner">
+            {{m.message}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
