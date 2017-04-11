@@ -2,4 +2,4 @@
 
 set -e
 
-chown -R nginx:nginx /var/www/baseApp/
+chown -R nginx:nginx /var/www/baseApp/*
