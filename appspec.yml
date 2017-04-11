@@ -5,7 +5,7 @@ files:
     destination: /var/www/baseApp
 
 permissions:
-  - object: /var/www/baseApp
+  - object: /var/www/baseApp/
     pattern: "**"
     owner: nginx
     group: nginx
