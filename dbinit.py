@@ -10,9 +10,12 @@ try:
     conn = engine.connect()
     conn.execute("commit")
     #conn.execute("CREATE DATABASE " + app.config['DATABASE_NAME'])
+
+    print ("Database init OK")
     conn.close()
 
 except:
     print ("Database exists")
+
 
 db.create_all()
