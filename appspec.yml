@@ -1,0 +1,29 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/baseApp
+hooks:
+  BeforeInstall:
+    - location: codeDeploy/beforeInstall.sh
+      timeout: 100
+      runas: root
+    - location: codeDeploy/installdep.sh
+      timeout: 300
+      runas: nginx
+  AfterInstall:
+    - location: codeDeploy/initDb.sh
+      timeout: 200
+      runas: nginx
+    - location: codeDeploy/wsgilink.sh
+      timeout: 100
+      runas: root
+
+  ApplicationStart:
+    - location: codeDeploy/startApp.sh
+      timeout: 100
+      runas: root
+  ApplicationStop:
+    - location: codeDeploy/stopApp.sh
+      timeout: 100
+      runas: root
