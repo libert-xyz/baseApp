@@ -22,10 +22,13 @@ hooks:
   AfterInstall:
     - location: codeDeploy/installdep.sh
       timeout: 300
-      runas: nginx
+      runas: root
     - location: codeDeploy/initDb.sh
       timeout: 200
-      runas: nginx
+      runas: root
+    - location: codeDeploy/chown.sh
+      timeout: 200
+      runas: root
     - location: codeDeploy/wsgilink.sh
       timeout: 100
       runas: root
