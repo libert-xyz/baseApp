@@ -18,10 +18,11 @@ hooks:
     - location: codeDeploy/beforeInstall.sh
       timeout: 100
       runas: root
+
+  AfterInstall:
     - location: codeDeploy/installdep.sh
       timeout: 300
       runas: nginx
-  AfterInstall:
     - location: codeDeploy/initDb.sh
       timeout: 200
       runas: nginx
