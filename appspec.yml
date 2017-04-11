@@ -9,7 +9,7 @@ permissions:
     pattern: "**"
     owner: nginx
     group: nginx
-    mode: 755
+    mode: 664
     type:
       - file
 
