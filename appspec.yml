@@ -3,6 +3,16 @@ os: linux
 files:
   - source: /
     destination: /var/www/baseApp
+
+permissions:
+  - object: /var/www/baseApp
+    pattern: "**"
+    owner: nginx
+    group: nginx
+    mode: 755
+    type:
+      - file
+
 hooks:
   BeforeInstall:
     - location: codeDeploy/beforeInstall.sh
