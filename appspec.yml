@@ -37,7 +37,14 @@ hooks:
     - location: codeDeploy/startApp.sh
       timeout: 100
       runas: root
+    - location: codeDeploy/register_with_elb.sh
+      timeout: 100
+      runas: root
+
   ApplicationStop:
     - location: codeDeploy/stopApp.sh
+      timeout: 100
+      runas: root
+    - location: codeDeploy/deregister_from_elb.sh
       timeout: 100
       runas: root
