@@ -1,0 +1,10 @@
+---
+# handlers file for flask
+
+- name: reconfigure locals
+  command: dpkg-reconfigure --frontend noninteractive locales
+
+- name: daemon reload
+  systemd:
+    name: uwsgi 
+    daemon_reload: yes

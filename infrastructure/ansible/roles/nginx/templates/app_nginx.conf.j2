@@ -1,0 +1,20 @@
+server {
+   listen	{{nginx_listen_port}};
+   server_name	{{nginx_server_name}};
+   charset	utf-8;
+   client_max_body_size	75M;
+
+
+   location ^~ /static/  {
+    include  {{nginx_config_dir}}/mime.types;
+    root {{application_dir}}/crud/;
+	}
+
+
+   location / { try_files $uri @baseapp; }
+   location @baseapp {
+   	include uwsgi_params;
+	uwsgi_pass unix:{{application_dir}}/uwsgi.sock;
+	}
+
+}

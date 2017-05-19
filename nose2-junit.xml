@@ -1,0 +1,14 @@
+<testsuite errors="0" failures="0" name="nose2-junit" skipped="0" tests="4" time="0.043">
+  <testcase classname="test_unit.FlaskrTestCase" name="test_index" time="0.024541">
+    <system-err />
+  </testcase>
+  <testcase classname="test_unit.FlaskrTestCase" name="test_message_get" time="0.010903">
+    <system-err />
+  </testcase>
+  <testcase classname="test_unit.FlaskrTestCase" name="test_message_post" time="0.004959">
+    <system-err />
+  </testcase>
+  <testcase classname="test_unit.FlaskrTestCase" name="test_render" time="0.002146">
+    <system-err />
+  </testcase>
+</testsuite>

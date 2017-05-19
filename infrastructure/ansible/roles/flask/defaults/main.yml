@@ -1,0 +1,60 @@
+---
+# defaults file for flask
+
+# The user to run application.
+app_user: nginx
+app_group: nginx
+
+# The directory to keep application source code.
+app_directory: "{{application_dir}}"
+
+# The directory to keep application logs.
+app_log_directory:
+
+# The path to application requirements.
+app_requirements: "{{ app_directory}}/requirements.txt"
+
+
+# The remote git repository to pull application code from, for example:
+# ssh://git@github.com/rschmidt_z/app.git
+app_repository: https://github.com/rschmidtz/baseApp.git
+
+# The version of the repository to checkout.
+app_version: master
+
+# The list of environment variables uses to run most of commands.
+app_environment:
+  - PATH: "{{ app_directory }}/venv/bin:{{ ansible_env.PATH }}"
+  - APP_SETTINGS: 'config.ProductionConfig'
+
+# The list of custom commands to run before and after deploy. These commands
+# uses previously defined environment to run.
+
+app_pre_hooks: []
+app_post_hooks:
+  - python3 dbinit.py
+  - python3 db_create_mssg.py
+
+# The path to application config to use when launch application.
+app_config:
+
+# The list of system packages required to build/run application.
+app_packages:
+  - git
+  - build-essential
+  - python3-dev
+  - python3-venv
+  - libpq-dev
+  - python-pip
+  - virtualenv
+  - upstart
+
+# Install `nodejs` and required package dependencies via `npm`?
+app_requires_npm: no
+
+# Install frontend package dependencies via `bower`?
+app_requires_bower: no
+
+
+# Application configuration variable
+APP_SETTINGS: 'config.ProductionConfig'

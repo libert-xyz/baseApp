@@ -1,0 +1,32 @@
+{
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-east-1",
+    "source_ami": "ami-80861296",
+    "instance_type": "t2.nano",
+    "ssh_username": "ubuntu",
+    "ami_name": "flask_{{timestamp}}",
+    "ami_regions": ["us-east-1"]
+  }],
+  "provisioners": [
+    {
+    "type": "shell",
+    "inline": [
+    "export LC_ALL='en_US.UTF-8'",
+    "sudo apt-get -y update",
+    "sudo apt-get -y install python-pip libssl-dev libffi-dev",
+    "sudo pip install ansible==2.2.0"
+    ]
+  },
+  {
+    "type": "ansible-local",
+      "playbook_file": "ansible/playbook.yml",
+      "role_paths": [
+          "ansible/roles/flask",
+          "ansible/roles/nginx"
+      ],
+      "group_vars": "ansible/group_vars/",
+      "playbook_dir": "ansible"
+      }
+  ]
+}

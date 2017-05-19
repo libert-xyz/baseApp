@@ -1,0 +1,16 @@
+[Unit]
+Description=uWSGI Emperor service
+After=syslog.target
+
+[Service]
+Environment=APP_SETTINGS={{ APP_SETTINGS }}
+ExecStart={{ application_dir }}/venv/bin/uwsgi --emperor /etc/uwsgi/vassals --uid {{  app_user }} --gid {{ app_group }} --logto /var/log/uwsgi/emperor.log
+RuntimeDirectory=uwsgi
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

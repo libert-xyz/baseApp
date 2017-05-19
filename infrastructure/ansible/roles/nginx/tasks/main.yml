@@ -1,0 +1,86 @@
+---
+# tasks file for nginx
+
+- name: Add PPA for nginx
+  apt_repository:
+    repo: 'ppa:nginx/stable'
+    state: present
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    allow_unauthenticated: yes
+
+- name: Install Curl
+  apt:
+    name: curl
+    state: present
+
+# - name: Create Group for Nginx
+#   group:
+#     name: "{{ nginx_group_name }}"
+#     system: yes
+#     state: present
+#
+# - name: Create User for Nginx
+#   user:
+#     name: "{{ nginx_user_name }}"
+#     groups: "{{ nginx_group_name }},www-data"
+#     append: yes
+
+- name: create nginx log directory
+  file:
+    path: "{{ nginx_log_dir }}"
+    state: directory
+    owner: "{{ nginx_user_name }}"
+    group: "www-data"
+    mode: 0775
+
+
+- name: Ensure log file permissions
+  file:
+    path: "{{ nginx_log_dir }}/{{ item }}"
+    state: file
+    owner: "{{ nginx_user_name }}"
+    group: "www-data"
+    mode: 0664
+  with_items:
+    - "access.log"
+    - "error.log"
+
+- name: Create nginx configuration directory
+  file:
+    path: "{{ nginx_config_dir }}"
+    state: directory
+    owner: "{{ nginx_user_name }}"
+    group: "{{ nginx_group_name }}"
+    mode: 0775
+
+
+- name: Copy nginx configuration.
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_config_dir }}/nginx.conf"
+    owner: "{{ nginx_user_name }}"
+    group: "{{ nginx_group_name }}"
+    mode: 0644
+  notify:
+    - restart nginx
+
+
+- name: Delete default vhost configuration
+  file:
+    path: "{{ nginx_config_dir }}/sites-enabled/default"
+    state: absent
+
+- name: Copy nginx vhost configuration
+  template:
+    src: app_nginx.conf.j2
+    dest: "{{ nginx_config_dir }}/conf.d/app_nginx.conf"
+    owner: "{{ nginx_user_name }}"
+    group: "{{ nginx_group_name }}"
+    mode: 0644
+  notify:
+    - restart nginx

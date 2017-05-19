@@ -1,0 +1,133 @@
+---
+# tasks file for flask
+
+# Ensure a locale exists.
+- name: set default locale
+  lineinfile: dest=/etc/bash.bashrc
+    regexp="export LC_ALL"
+    line="export LC_ALL=\'en_US.UTF-8\'"
+
+- name: set default locale LC_TYPE
+  lineinfile: dest=/etc/bash.bashrc
+    regexp="export LC_CTYPE"
+    line="export LC_CTYPE=\'en_US.UTF-8\'"
+
+- name: set default locale LANGUAGE
+  lineinfile: dest=/etc/bash.bashrc
+    regexp="export LANGUAGE"
+    line="export LANGUAGE=\'en_US.UTF-8\'"
+
+- name: APP env
+  lineinfile: dest=/etc/bash.bashrc
+    regexp="export APP_SETTINGS"
+    line="export APP_SETTINGS={{ APP_SETTINGS }}"
+
+
+- name: Source the bashrc file
+  shell: bash
+
+- name: Run apt-get Update
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Create Group for Deploy
+  group:
+    name: "{{ app_group }}"
+    system: yes
+    state: present
+
+- name: Create User for Deploy
+  user:
+    name: "{{  app_user }}"
+    groups: "{{ app_group }}"
+    append: yes
+
+- name: Create App Folder
+  file:
+    path: "{{ app_directory }}"
+    state: directory
+    mode: 0755
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+
+- name: Installed Packages required for python
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    "{{ app_packages }}"
+  tags:
+    - apt
+    - setup
+
+- name: Clone the Source Code
+  git:
+    repo: "{{ app_repository }}"
+    dest: "{{ app_directory }}"
+    version: "{{ app_version }}"
+    accept_hostkey: yes
+  become: yes
+  become_user: "{{ app_user }}"
+  tags: app
+
+- name: Install application dependencies into virtualenv
+  pip:
+    requirements: "{{ app_requirements }}"
+    virtualenv_command: virtualenv
+    virtualenv: "{{ app_directory }}/venv"
+  tags: pip
+  become: yes
+  become_user: "{{ app_user }}"
+
+- name: Database init
+  command: "{{ item }} arg1 arg2"
+  args:
+    chdir: "{{ app_directory }}"
+    creates: "{{ app_directory }}/messages.db"
+
+  with_items: "{{ app_post_hooks }}"
+  environment:
+    - "{{ app_environment }}"
+  become: yes
+  become_user: "{{ app_user }}"
+  tags:
+    - app
+    - hook
+
+########## uWSGI Configuration ##########3
+
+- name: Uwsgi log Folder
+  file:
+    path: /var/log/uwsgi
+    state: directory
+    mode: 0755
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    recurse: yes
+
+- name: uWSGI vassals folder
+  file:
+    path: /etc/uwsgi/vassals
+    state: directory
+
+- name: symbolic link to UwsGI.ini
+  file:
+    src: "{{ application_dir }}/uwsgi.ini"
+    dest: /etc/uwsgi/vassals/uwsgi.ini
+    state: link
+
+- name: uWSGI Configuration
+  template:
+    src: uwsgi.service.j2
+    dest: /etc/systemd/system/uwsgi.service
+  notify:
+   - daemon reload
+
+- name: start app
+  systemd:
+    name: uwsgi
+    state: started
+    enabled: True
+  environment:
+    - "{{ app_environment }}"
