@@ -439,17 +439,6 @@ Resources:
           - Name: Source
           - Name: AMI
           RunOrder: 1
-        - Name: Test
-          ActionTypeId:
-            Category: Build
-            Owner: AWS
-            Provider: CodeBuild
-            Version: 1
-          Configuration:
-            ProjectName: !Ref RunAcceptanceProject
-          InputArtifacts:
-          - Name: Acceptance
-          RunOrder: 2
       - Name: Production
         Actions:
         - Name: Deploy
