@@ -9,15 +9,12 @@ phases:
     commands:
       - apt-get update -y
       - apt-get install python-pip python-dev build-essential -y
-      - pip install virtualenv
 
   pre_build:
     commands:
       - echo Nothing to do in the pre_build phase.
   build:
     commands:
-      - virtualenv venv
-      - source venv/bin/activate
       - pip install requirements.txt
       - nose2
   post_build:
