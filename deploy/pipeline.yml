@@ -295,9 +295,13 @@ Resources:
             variables:
               APP_SETTINGS: "config.TestingConfig"
           phases:
+            install:
+              commands:
+              - 'apt-get update -y'
+              - 'apt-get install python-pip python-dev build-essential -y'
             build:
               commands:
-              - 'pip install requirements.txt'
+              - 'pip install -r requirements.txt'
               - 'nose2'
           artifacts:
             files:
