@@ -297,7 +297,8 @@ Resources:
           phases:
             build:
               commands:
-              - 'venv/bin/nose2'
+              - 'pip install requirements.txt'
+              - 'nose2'
           artifacts:
             files:
             - 'app/**/*'
@@ -374,24 +375,24 @@ Resources:
           OutputArtifacts:
           - Name: Source
           RunOrder: 1
-      - Name: Pipeline
-        Actions:
-        - Name: DeployPipeline
-          ActionTypeId:
-            Category: Deploy
-            Owner: AWS
-            Provider: CloudFormation
-            Version: 1
-          Configuration:
-            ActionMode: CREATE_UPDATE
-            Capabilities: CAPABILITY_IAM
-            RoleArn: !GetAtt 'CloudFormationRole.Arn'
-            StackName: !Ref 'AWS::StackName'
-            TemplatePath: 'Source::infrastructure/pipeline.yml'
-            ParameterOverrides: !Sub '{"RepositoryName": "${RepositoryName}", "BranchName": "${BranchName}"}'
-          InputArtifacts:
-          - Name: Source
-          RunOrder: 1
+      # - Name: Pipeline
+      #   Actions:
+      #   - Name: DeployPipeline
+      #     ActionTypeId:
+      #       Category: Deploy
+      #       Owner: AWS
+      #       Provider: CloudFormation
+      #       Version: 1
+      #     Configuration:
+      #       ActionMode: CREATE_UPDATE
+      #       Capabilities: CAPABILITY_IAM
+      #       RoleArn: !GetAtt 'CloudFormationRole.Arn'
+      #       StackName: !Ref 'AWS::StackName'
+      #       TemplatePath: 'Source::infrastructure/pipeline.yml'
+      #       ParameterOverrides: !Sub '{"RepositoryName": "${RepositoryName}", "BranchName": "${BranchName}"}'
+      #     InputArtifacts:
+      #     - Name: Source
+      #     RunOrder: 1
       - Name: Build
         Actions:
         - Name: BuildAndTestApp
