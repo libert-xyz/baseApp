@@ -4,6 +4,11 @@ Description: 'EC2'
 Parameters:
 
   # A bastion host increases the security of your system. In this case, we use one of our Free Templates for AWS CloudFormation (https://github.com/widdix/aws-cf-templates/tree/master/vpc).
+
+  ParentVPCStack:
+    Description: 'Stack name of parent VPC stack based on vpc/vpc-*azs.yaml template.'
+    Type: String
+
   ParentSSHBastionStack:
     Description: 'Optional Stack name of parent SSH bastion host/instance stack based on vpc/vpc-ssh-bastion.yaml template.'
     Type: String
