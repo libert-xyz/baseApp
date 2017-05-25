@@ -20,13 +20,13 @@
   },
   {
     "type": "ansible-local",
-      "playbook_file": "ansible/playbook.yml",
+      "playbook_file": "infrastructure/ansible/playbook.yml",
       "role_paths": [
-          "ansible/roles/flask",
-          "ansible/roles/nginx"
+          "infrastructure/ansible/roles/flask",
+          "infrastructure/ansible/roles/nginx"
       ],
-      "group_vars": "ansible/group_vars/",
-      "playbook_dir": "ansible"
+      "group_vars": "infrastructure/ansible/group_vars/",
+      "playbook_dir": "infrastructure/ansible"
       }
   ]
 }
