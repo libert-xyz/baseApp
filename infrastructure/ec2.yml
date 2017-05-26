@@ -231,9 +231,9 @@ Resources:
       - Key: Name
         Value: 'ec2'
         PropagateAtLaunch: true
-    CreationPolicy: # wait up to 15 minutes to receive a success signal during instance startup
-      ResourceSignal:
-        Timeout: PT15M
+    # CreationPolicy: # wait up to 15 minutes to receive a success signal during instance startup
+    #   ResourceSignal:
+    #     Timeout: PT15M
     UpdatePolicy: # this allows rolling updates if a change requires new EC2 instances
       AutoScalingRollingUpdate:
         PauseTime: PT15M
