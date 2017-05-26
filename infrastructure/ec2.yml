@@ -206,89 +206,6 @@ Resources:
       RetentionInDays: !Ref LogsRetentionInDays
   LaunchConfiguration:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
-    Metadata:
-      'AWS::CloudFormation::Init': # Configuration for the cfn-ini helper script that runs on startup. This is only needed for the dynamic configuration. The rest is backed into the AMI in the pipeline.
-        config:
-          files:
-            '/etc/awslogs/awscli.conf': # configuration file for the CloudWatch Logs agent that ships logs to the service
-              content: !Sub |
-                [default]
-                region = ${AWS::Region}
-                [plugins]
-                cwlogs = cwlogs
-              mode: '000644'
-              owner: root
-              group: root
-            '/etc/awslogs/awslogs.conf': # configuration file for the CloudWatch Logs agent that ships logs to the service
-              content: !Sub |
-                [general]
-                state_file = /var/lib/awslogs/agent-state
-                [/var/log/messages]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/messages
-                log_stream_name = {instance_id}/var/log/messages
-                log_group_name = ${Logs}
-                [/var/log/secure]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/secure
-                log_stream_name = {instance_id}/var/log/secure
-                log_group_name = ${Logs}
-                [/var/log/cron]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/cron
-                log_stream_name = {instance_id}/var/log/cron
-                log_group_name = ${Logs}
-                [/var/log/cloud-init.log]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/cloud-init.log
-                log_stream_name = {instance_id}/var/log/cloud-init.log
-                log_group_name = ${Logs}
-                [/var/log/cfn-init.log]
-                datetime_format = %Y-%m-%d %H:%M:%S
-                file = /var/log/cfn-init.log
-                log_stream_name = {instance_id}/var/log/cfn-init.log
-                log_group_name = ${Logs}
-                [/var/log/cfn-hup.log]
-                datetime_format = %Y-%m-%d %H:%M:%S
-                file = /var/log/cfn-hup.log
-                log_stream_name = {instance_id}/var/log/cfn-hup.log
-                log_group_name = ${Logs}
-                [/var/log/cfn-init-cmd.log]
-                datetime_format = %Y-%m-%d %H:%M:%S
-                file = /var/log/cfn-init-cmd.log
-                log_stream_name = {instance_id}/var/log/cfn-init-cmd.log
-                log_group_name = ${Logs}
-                [/var/log/cloud-init-output.log]
-                file = /var/log/cloud-init-output.log
-                log_stream_name = {instance_id}/var/log/cloud-init-output.log
-                log_group_name = ${Logs}
-                [/var/log/dmesg]
-                file = /var/log/dmesg
-                log_stream_name = {instance_id}/var/log/dmesg
-                log_group_name = ${Logs}
-                [/var/log/forever.log]
-                file = /var/log/forever.log
-                log_stream_name = {instance_id}/var/log/forever.log
-                log_group_name = ${Logs}
-                [/var/log/app.out]
-                file = /var/log/app.out
-                log_stream_name = {instance_id}/var/log/app.out
-                log_group_name = ${Logs}
-                [/var/log/app.err]
-                file = /var/log/app.err
-                log_stream_name = {instance_id}/var/log/app.err
-                log_group_name = ${Logs}
-              mode: '000644'
-              owner: root
-              group: root
-          services:
-            sysvinit:
-              awslogs: # start the CloudWatch Logs agent
-                enabled: true
-                ensureRunning: true
-                files:
-                - '/etc/awslogs/awslogs.conf'
-                - '/etc/awslogs/awscli.conf'
     Properties:
       ImageId: !Ref ImageId # the image that is created during the build in the pipeline passed in as a parameter
       IamInstanceProfile: !Ref InstanceProfile
@@ -296,11 +213,6 @@ Resources:
       SecurityGroups:
       - !Ref SecurityGroup
       KeyName: !If [HasKeyName, !Ref KeyName, !Ref 'AWS::NoValue']
-      UserData: # execute cfn-init helper script and signal success or failure back to CloudFormation
-        'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfiguration --region ${AWS::Region}
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
   AutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
@@ -395,30 +307,7 @@ Resources:
         Value: !Ref AutoScalingGroup
       ComparisonOperator: GreaterThanThreshold
       MetricName: CPUUtilization
-  # Filters all logs for the word Error
-  AppErrorsLogsFilter:
-    Type: 'AWS::Logs::MetricFilter'
-    Properties:
-      FilterPattern: Error
-      LogGroupName: !Ref Logs
-      MetricTransformations:
-      - MetricName: AppErrors
-        MetricNamespace: !Ref 'AWS::StackName'
-        MetricValue: 1
-  # Sends an alert if the word Error was found in the logs
-  AppErrorsAlarm:
-    Type: 'AWS::CloudWatch::Alarm'
-    Properties:
-      AlarmDescription: 'application errors in logs'
-      Namespace: !Ref 'AWS::StackName'
-      MetricName: AppErrors
-      Statistic: Sum
-      Period: 60
-      EvaluationPeriods: 1
-      Threshold: 0
-      ComparisonOperator: GreaterThanThreshold
-      AlarmActions:
-      - !Ref Alerts
+
 # A CloudFormation stack can return information that is needed by other stacks or scripts.
 Outputs:
   DNSName:
