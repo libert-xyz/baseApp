@@ -204,8 +204,16 @@ Resources:
     Type: 'AWS::Logs::LogGroup'
     Properties:
       RetentionInDays: !Ref LogsRetentionInDays
+
   LaunchConfiguration:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
+    Metadata:
+      'AWS::CloudFormation::Init':
+        config:
+          commands:
+            'update':
+              command: 'apt-get update'
+              cwd: '/'
     Properties:
       ImageId: !Ref ImageId # the image that is created during the build in the pipeline passed in as a parameter
       IamInstanceProfile: !Ref InstanceProfile
@@ -213,6 +221,13 @@ Resources:
       SecurityGroups:
       - !Ref SecurityGroup
       KeyName: !If [HasKeyName, !Ref KeyName, !Ref 'AWS::NoValue']
+      UserData:
+        'Fn::Base64': !Sub |
+          #!/bin/bash -x
+          pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+          cfn-init -v --stack ${AWS::StackName} --resource LaunchConfiguration --region ${AWS::Region}
+          cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+
   AutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
@@ -231,9 +246,9 @@ Resources:
       - Key: Name
         Value: 'ec2'
         PropagateAtLaunch: true
-    # CreationPolicy: # wait up to 15 minutes to receive a success signal during instance startup
-    #   ResourceSignal:
-    #     Timeout: PT15M
+    CreationPolicy: # wait up to 15 minutes to receive a success signal during instance startup
+      ResourceSignal:
+        Timeout: PT15M
     UpdatePolicy: # this allows rolling updates if a change requires new EC2 instances
       AutoScalingRollingUpdate:
         PauseTime: PT15M
