@@ -3,8 +3,7 @@
        "ImageId": {"Fn::GetParam": ["AMI", "infrastructure/ami.json", "image"]},
        "ParentVPCStack": "ansible-vpc",
        "ParentSSHBastionStack": "",
-       "KeyName": "",
+       "KeyName": "myAws",
        "AdminEmail": "rschmidt@nuvops.com"
      }
   }
-

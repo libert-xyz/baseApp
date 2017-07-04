@@ -131,3 +131,6 @@
     enabled: True
   environment:
     - "{{ app_environment }}"
+
+- name: install cfn-init
+  shell: pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
