@@ -211,9 +211,9 @@ Resources:
       'AWS::CloudFormation::Init':
         config:
           commands:
-            'update':
-              command: 'apt-get update'
-              cwd: '/'
+            update:
+              command: 'apt-get -y update'
+              cwd: '~'
     Properties:
       ImageId: !Ref ImageId # the image that is created during the build in the pipeline passed in as a parameter
       IamInstanceProfile: !Ref InstanceProfile
@@ -225,8 +225,8 @@ Resources:
         'Fn::Base64': !Sub |
           #!/bin/bash -x
           pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
-          cfn-init -v --stack ${AWS::StackName} --resource LaunchConfiguration --region ${AWS::Region}
-          cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+          /usr/local/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfiguration --region ${AWS::Region}
+          /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
 
   AutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
