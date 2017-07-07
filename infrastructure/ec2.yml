@@ -234,10 +234,10 @@ Resources:
       SecurityGroups:
       - !Ref SecurityGroup
       KeyName: !If [HasKeyName, !Ref KeyName, !Ref 'AWS::NoValue']
-      #UserData:
-      #  'Fn::Base64': !Sub |
-      #    #!/bin/bash -xe
-      #    /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+      UserData:
+        'Fn::Base64': !Sub |
+          #!/bin/bash -xe
+          /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource AutoScalingGroup --region ${AWS::Region}
 
   AutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
@@ -260,8 +260,8 @@ Resources:
     CreationPolicy: # wait up to 15 minutes to receive a success signal during instance startup
       AutoScalingCreationPolicy:
         MinSuccessfulInstancesPercent: 100
-      #ResourceSignal:
-      #  Timeout: PT15M
+      ResourceSignal:
+        Timeout: PT15M
     UpdatePolicy: # this allows rolling updates if a change requires new EC2 instances
       #AutoScalingRollingUpdate:
       #  PauseTime: PT15M
