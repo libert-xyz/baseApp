@@ -237,7 +237,8 @@ Resources:
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash -xe
-          /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource AutoScalingGroup --region ${AWS::Region}
+          touch /tmp/temp.txt
+          /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
 
   AutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
