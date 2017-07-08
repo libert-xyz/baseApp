@@ -244,9 +244,9 @@ Resources:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
       LaunchConfigurationName: !Ref LaunchConfiguration
-      MinSize: 1 # at least two instances should always be running
-      MaxSize: 2 # at most 4 instances are allowed to run
-      DesiredCapacity: 1 # you want to start with 2 instances
+      MinSize: 2 # at least two instances should always be running
+      MaxSize: 3 # at most 4 instances are allowed to run
+      DesiredCapacity: 2 # you want to start with 2 instances
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB # make use of the health check of the load balancer which checks the application health instead of only checking the instance health
       VPCZoneIdentifier:
